@@ -326,15 +326,11 @@ main {
 
     border-radius: 50%;
 
-    filter: grayscale(100%);
-
     transition:
-        filter 0.4s ease,
         transform 0.4s ease;
 }
 
 .image-circle:hover img {
-    filter: grayscale(0%);
     transform: scale(1.03);
 }
 
@@ -476,14 +472,6 @@ main {
     object-fit: cover;
 
     margin-bottom: 30px;
-
-    filter: grayscale(80%);
-
-    transition: filter 0.4s ease;
-}
-
-.project-card:hover img {
-    filter: grayscale(0%);
 }
 
 .project-card h3 {
