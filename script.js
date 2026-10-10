@@ -55,3 +55,83 @@ const observer = new IntersectionObserver(
 fadeElements.forEach(function (element) {
     observer.observe(element);
 });
+
+
+async function getProjects() {
+    const container = document.getElementById("projects-container");
+
+    try {
+        const response = await fetch("/api/projects");
+
+        if (!response.ok) {
+            throw new Error("Could not load projects");
+        }
+
+        const projects = await response.json();
+        container.replaceChildren();
+
+        projects.forEach((project, index) => {
+            const card = document.createElement("div");
+            card.className = "project-card";
+
+            const number = document.createElement("div");
+            number.className = "project-number";
+            number.textContent = String(index + 1).padStart(2, "0");
+
+            const image = document.createElement("img");
+            image.alt = project.name;
+
+            if (project.image) {
+                image.src = project.image;
+
+                image.onerror = function () {
+                    image.remove();
+                };
+            }
+
+            const title = document.createElement("h3");
+            title.textContent = project.name;
+
+            const description = document.createElement("p");
+            description.textContent = project.description;
+
+            const technologies = document.createElement("div");
+            technologies.className = "project-tech";
+
+            project.technologies.forEach((technology) => {
+                const tag = document.createElement("span");
+                tag.textContent = technology;
+                technologies.appendChild(tag);
+            });
+
+            const links = document.createElement("div");
+            links.className = "project-links";
+
+            if (project.liveDemo) {
+                const liveDemo = document.createElement("a");
+                liveDemo.href = project.liveDemo;
+                liveDemo.target = "_blank";
+                liveDemo.rel = "noopener noreferrer";
+                liveDemo.textContent = "Live Demo →";
+                links.appendChild(liveDemo);
+            }
+
+            if (project.github) {
+                const github = document.createElement("a");
+                github.href = project.github;
+                github.target = "_blank";
+                github.rel = "noopener noreferrer";
+                github.textContent = "GitHub →";
+                links.appendChild(github);
+            }
+            card.append(number, image, title, description, technologies, links);
+            container.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error("Failed to load projects:", error);
+        container.textContent = "Unable to load projects.";
+    }
+}
+
+getProjects();

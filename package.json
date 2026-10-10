@@ -1,0 +1,22 @@
+{
+  "name": "portfolio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sarvesh3434/Portfolio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Sarvesh3434/Portfolio/issues"
+  },
+  "homepage": "https://github.com/Sarvesh3434/Portfolio#readme",
+  "dependencies": {
+    "express": "^5.3.0"
+  }
+}
