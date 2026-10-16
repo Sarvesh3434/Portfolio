@@ -61,7 +61,10 @@ async function getProjects() {
     const container = document.getElementById("projects-container");
 
     try {
-        const response = await fetch("/api/projects");
+        const response = await fetch("http://localhost:3000/api/projects");
+
+        console.log("API URL:", response.url);
+        console.log("API status:", response.status);
 
         if (!response.ok) {
             throw new Error("Could not load projects");

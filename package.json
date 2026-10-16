@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Sarvesh3434/Portfolio#readme",
   "dependencies": {
+    "cors": "^2.8.6",
     "express": "^5.3.0"
   }
 }

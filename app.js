@@ -1,10 +1,16 @@
 
 const express = require("express");
+const cors = require("cors");
 
 const app = express();
 
+// Allow the frontend (e.g. Live Server on 127.0.0.1:5500) to call this API
+app.use(cors());
+
 // Serve your existing portfolio files
-app.use(express.static(__dirname));
+const path = require("path");
+
+app.use(express.static(path.join(__dirname, "public")));
 
 // Homepage
 app.get("/", (req, res) => {
@@ -35,7 +41,7 @@ app.get("/api/projects", (req, res) => {
             name: "P-LENS",
             description: "A research project where a GRU model forecasts traffic stress and a controller applies budgeted add, prune, and rewire mutations to evolve the network topology.",
             technologies: ["Python", "PyTorch", "NetworkX", "scikit-learn"],
-            image: "images/project3.jpg.png",
+            image: "images/project3.jpg.png.png",
             liveDemo: "",
             github: "https://github.com/Sarvesh3434/P-LENS"
         }
