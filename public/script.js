@@ -40,15 +40,15 @@ const observer = new IntersectionObserver(
 
             if (entry.isIntersecting) {
                 entry.target.classList.add("show");
-            } else {
-                entry.target.classList.remove("show");
+                observer.unobserve(entry.target);
             }
 
         });
 
     },
     {
-        threshold: 0.35
+        threshold: 0.12,
+        rootMargin: "0px 0px -60px 0px"
     }
 );
 
@@ -61,10 +61,14 @@ async function getProjects() {
     const container = document.getElementById("projects-container");
 
     try {
-        const response = await fetch("http://localhost:3000/api/projects");
+        const response = await fetch("/api/projects", {
+            credentials: "include"
+        });
 
-        console.log("API URL:", response.url);
-        console.log("API status:", response.status);
+        if (response.status === 401) {
+            window.location.href = "/login";
+            return;
+        }
 
         if (!response.ok) {
             throw new Error("Could not load projects");
@@ -138,3 +142,50 @@ async function getProjects() {
 }
 
 getProjects();
+
+
+async function loadUser() {
+    try {
+        const response = await fetch("/api/me", {
+            credentials: "include"
+        });
+
+        if (response.status === 401) {
+            window.location.href = "/login";
+            return;
+        }
+
+        const data = await response.json();
+
+        const nameElement = document.getElementById("nav-user-name");
+
+        if (nameElement && data.user) {
+            nameElement.textContent = "Hi, " + (data.user.name || data.user.username);
+        }
+    } catch (error) {
+        console.error("Failed to load user:", error);
+    }
+}
+
+loadUser();
+
+
+const logoutButton = document.getElementById("logout-btn");
+
+if (logoutButton) {
+    logoutButton.addEventListener("click", async function () {
+        logoutButton.textContent = "Logging out...";
+        logoutButton.disabled = true;
+
+        try {
+            await fetch("/api/logout", {
+                method: "POST",
+                credentials: "include"
+            });
+        } catch (error) {
+            console.error("Failed to log out:", error);
+        }
+
+        window.location.href = "/login";
+    });
+}

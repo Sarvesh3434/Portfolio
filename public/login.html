@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in | Sarvesh.S</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+
+<body>
+
+    <div class="background">
+        <div class="grid"></div>
+    </div>
+
+    <main class="login-wrapper">
+
+        <div class="login-card">
+
+            <div class="login-brand">
+                Sarvesh<span>.S</span>
+            </div>
+
+            <h1 class="login-title">
+                Welcome back
+            </h1>
+
+            <p class="login-subtitle">
+                Sign in to view the portfolio.
+            </p>
+
+            <div id="login-alert" class="login-alert" role="alert" hidden></div>
+
+            <form id="login-form" class="login-form" autocomplete="off">
+
+                <label class="field">
+                    <span>Username</span>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Enter your username"
+                        required
+                        autofocus>
+                </label>
+
+                <label class="field">
+                    <span>Password</span>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        required>
+                </label>
+
+                <button type="submit" class="btn-primary" id="login-submit">
+                    Sign in
+                </button>
+
+            </form>
+
+            <div class="divider">
+                <span>or</span>
+            </div>
+
+            <a href="/auth/github" class="btn-github">
+                <svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true" fill="currentColor">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                </svg>
+                Continue with GitHub
+            </a>
+
+            <p class="login-note" id="github-note" hidden>
+                GitHub sign-in is not configured yet.
+            </p>
+
+        </div>
+
+    </main>
+
+    <script>
+        const form = document.getElementById("login-form");
+        const alertBox = document.getElementById("login-alert");
+        const submitButton = document.getElementById("login-submit");
+        const githubNote = document.getElementById("github-note");
+
+        const messages = {
+            invalid: "Invalid username or password.",
+            github: "GitHub sign-in failed. Please try again.",
+            token: "Could not complete GitHub sign-in. Please try again.",
+            state: "Your sign-in session expired. Please try again.",
+            denied: "GitHub sign-in was cancelled.",
+            github_unavailable: "GitHub sign-in is not configured yet."
+        };
+
+        function showAlert(text, type) {
+            alertBox.textContent = text;
+            alertBox.className = "login-alert " + (type || "error");
+            alertBox.hidden = false;
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const errorCode = params.get("error");
+
+        if (errorCode && messages[errorCode]) {
+            showAlert(messages[errorCode], "error");
+        }
+
+        fetch("/api/config")
+            .then((response) => response.json())
+            .then((config) => {
+                if (!config.githubEnabled) {
+                    githubNote.hidden = false;
+                    document
+                        .querySelector(".btn-github")
+                        .classList.add("disabled");
+                }
+            })
+            .catch(() => {});
+
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value;
+
+            submitButton.disabled = true;
+            submitButton.textContent = "Signing in...";
+            alertBox.hidden = true;
+
+            try {
+                const response = await fetch("/api/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.ok) {
+                    showAlert(data.error || messages.invalid, "error");
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Sign in";
+                    return;
+                }
+
+                showAlert("Signed in. Redirecting...", "success");
+                window.location.href = "/";
+            } catch (error) {
+                showAlert("Something went wrong. Please try again.", "error");
+                submitButton.disabled = false;
+                submitButton.textContent = "Sign in";
+            }
+        });
+    </script>
+
+</body>
+
+</html>
